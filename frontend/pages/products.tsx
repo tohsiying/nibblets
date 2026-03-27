@@ -123,9 +123,10 @@ export default function ProductsPage() {
     status: statusFilter === 'all' ? undefined : statusFilter,
   })
 
-  const isMock = !!error || !apiData
-  const products = apiData?.data || MOCK_PRODUCTS
-  const totalPages = apiData?.pages || 1
+  const hasEmptyData = apiData?.data?.length === 0
+  const isMock = !!error || !apiData || hasEmptyData
+  const products = isMock ? MOCK_PRODUCTS : apiData?.data || MOCK_PRODUCTS
+  const totalPages = isMock ? 1 : apiData?.pages || 1
 
   // Client-side filtering for mock data
   const filtered = isMock

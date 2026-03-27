@@ -98,12 +98,12 @@ export default function LineChart({
       {/* X-axis labels */}
       {showLabels &&
         data.map((d, i) =>
-          i % labelStep === 0 || i === data.length - 1 ? (
+          (i % labelStep === 0 && !(i !== data.length - 1 && data.length - 1 - i < labelStep)) || i === data.length - 1 ? (
             <text
               key={i}
               x={points[i].x}
               y={height - 4}
-              textAnchor="middle"
+              textAnchor={i === 0 ? 'start' : i === data.length - 1 ? 'end' : 'middle'}
               fill="rgba(255,255,255,0.35)"
               fontSize="10"
             >

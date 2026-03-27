@@ -71,11 +71,14 @@ export default function DashboardPage() {
   const { data: revenueData, error: revenueError } = useRevenue('30d')
   const { data: topData, error: topError } = useTopProducts(5)
 
-  // Determine if we should use mock data
-  const isMock = useMock || !!(storeError && revenueError)
-  const store = storeData || MOCK_STORE
-  const revenue = revenueData?.series || MOCK_REVENUE
-  const topProducts = topData?.products || MOCK_TOP_PRODUCTS
+  // Determine if we should use mock data (also when store has no data yet)
+  const hasEmptyData =
+    revenueData?.series?.every((d) => d.revenue === 0 && d.orders === 0) ||
+    (topData?.products?.length === 0)
+  const isMock = useMock || !!(storeError && revenueError) || hasEmptyData
+  const store = isMock ? MOCK_STORE : (storeData || MOCK_STORE)
+  const revenue = isMock ? MOCK_REVENUE : (revenueData?.series || MOCK_REVENUE)
+  const topProducts = isMock ? MOCK_TOP_PRODUCTS : (topData?.products || MOCK_TOP_PRODUCTS)
 
   // Compute KPIs from revenue series
   const totalRevenue = revenue.reduce((sum, d) => sum + d.revenue, 0)
