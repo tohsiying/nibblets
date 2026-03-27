@@ -272,3 +272,14 @@ await api.injectStorefrontScript(`${window.location.origin}/my-widget.js`)
 - **Page not loading** → Make sure you wrapped it in `<Shell>`. Check for TypeScript errors in terminal
 - **Styles look wrong** → Use Tailwind classes only. Check globals.css is imported in _app.tsx
 - **SQLite errors** → Delete `hackathon.db` and restart — it will re-sync from Shopify
+
+## Browser Automation
+
+Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
