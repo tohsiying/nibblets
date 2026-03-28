@@ -44,6 +44,16 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    href: '/generate',
+    label: 'Generate',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M6.5 5.5v5l4-2.5-4-2.5z" fill="currentColor" />
+      </svg>
+    ),
+  },
 ]
 
 export default function Shell({ title, children }: ShellProps) {
