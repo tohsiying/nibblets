@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 interface VideoItem {
   id: string
@@ -19,103 +19,95 @@ interface VideoCarouselProps {
 
 export default function VideoCarousel({ videos, onPublish, onExport, exportingId }: VideoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [rotation, setRotation] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [paused, setPaused] = useState(false)
 
   const count = videos.length
-  const angleStep = count > 0 ? 360 / Math.max(count, 5) : 72
-  const radius = count <= 3 ? 280 : count <= 5 ? 340 : 400
 
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => (prev + 1) % (count || 1))
+  }, [count])
+
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => (prev - 1 + (count || 1)) % (count || 1))
+  }, [count])
+
+  // Auto-advance every 3 seconds (clockwise = next)
   useEffect(() => {
-    setRotation(-activeIndex * angleStep)
-  }, [activeIndex, angleStep])
-
-  function handlePrev() {
-    setActiveIndex((prev) => (prev - 1 + count) % count)
-  }
-
-  function handleNext() {
-    setActiveIndex((prev) => (prev + 1) % count)
-  }
-
-  function handleMouseDown(e: React.MouseEvent) {
-    setIsDragging(true)
-    setStartX(e.clientX)
-  }
-
-  function handleMouseMove(e: React.MouseEvent) {
-    if (!isDragging) return
-    const diff = e.clientX - startX
-    if (Math.abs(diff) > 60) {
-      if (diff > 0) handlePrev()
-      else handleNext()
-      setStartX(e.clientX)
-    }
-  }
-
-  function handleMouseUp() {
-    setIsDragging(false)
-  }
+    if (paused || count === 0) return
+    const interval = setInterval(handleNext, 3000)
+    return () => clearInterval(interval)
+  }, [paused, count, handleNext])
 
   if (count === 0) return null
 
+  // Get offset from active index, wrapping around
+  function getOffset(i: number): number {
+    let diff = i - activeIndex
+    // Wrap around for shortest path
+    if (diff > count / 2) diff -= count
+    if (diff < -count / 2) diff += count
+    return diff
+  }
+
+  const activeVideo = videos[activeIndex]
+
   return (
-    <div className="relative w-full py-8">
+    <div
+      className="relative w-full py-6"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold" style={{ color: '#2D2A26', fontFamily: 'serif' }}>
+      <div className="text-center mb-10">
+        <h2 className="text-2xl" style={{ fontFamily: "'Playfair Display', serif", color: '#2D2A26' }}>
           Your Generated Content
         </h2>
         <p className="text-sm mt-2" style={{ color: '#8A8580' }}>
-          Boost your brand with AI-generated UGC videos from your product catalog
+          Boost your brand with AI-generated UGC videos
         </p>
       </div>
 
-      {/* 3D Carousel */}
-      <div
-        className="relative mx-auto select-none"
-        style={{ height: 380, perspective: 1200 }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        ref={containerRef}
-      >
-        <div
-          className="absolute w-full h-full"
-          style={{
-            transformStyle: 'preserve-3d',
-            transform: `rotateY(${rotation}deg)`,
-            transition: isDragging ? 'none' : 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          }}
-        >
+      {/* Carousel container */}
+      <div className="relative mx-auto select-none" style={{ height: 380, perspective: 1000 }}>
+        <div className="relative w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
           {videos.map((video, i) => {
-            const angle = i * angleStep
-            const isActive = i === activeIndex
+            const offset = getOffset(i)
+
+            // Only render cards within visible range
+            if (Math.abs(offset) > 3) return null
+
+            const xOffset = offset * 155
+            const zOffset = -Math.abs(offset) * 70
+            const rotateY = offset * 22
+            const scale = offset === 0 ? 1 : Math.max(0.68, 1 - Math.abs(offset) * 0.13)
+            const opacity = offset === 0 ? 1 : Math.max(0.35, 1 - Math.abs(offset) * 0.22)
+            const isActive = offset === 0
 
             return (
               <div
                 key={video.id}
-                className="absolute left-1/2 top-0"
+                className="absolute transition-all duration-700 ease-out cursor-pointer"
                 style={{
-                  width: 180,
-                  height: 320,
-                  marginLeft: -90,
-                  transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
-                  transformStyle: 'preserve-3d',
+                  width: 200,
+                  height: 356,
+                  left: '50%',
+                  top: 0,
+                  marginLeft: -100,
+                  transform: `translateX(${xOffset}px) translateZ(${zOffset}px) rotateY(${rotateY}deg) scale(${scale})`,
+                  opacity,
+                  zIndex: 10 - Math.abs(offset),
+                }}
+                onClick={() => {
+                  setActiveIndex(i)
+                  setPaused(true)
                 }}
               >
                 <div
-                  className="w-full h-full rounded-2xl overflow-hidden shadow-lg transition-all duration-300 cursor-pointer"
+                  className="w-full h-full rounded-2xl overflow-hidden shadow-lg"
                   style={{
-                    background: video.videoUrl ? '#000' : '#F5F0E8',
-                    border: isActive ? '3px solid #D4826A' : '2px solid rgba(0,0,0,0.08)',
-                    transform: isActive ? 'scale(1.08)' : 'scale(0.95)',
-                    opacity: isActive ? 1 : 0.75,
+                    background: video.videoUrl ? '#000' : '#EDE8E0',
+                    border: isActive ? '3px solid #D4826A' : '2px solid rgba(0,0,0,0.06)',
                   }}
-                  onClick={() => setActiveIndex(i)}
                 >
                   {video.videoUrl ? (
                     <video
@@ -124,7 +116,6 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
                       muted={!isActive}
                       preload="metadata"
                       className="w-full h-full object-cover"
-                      style={{ borderRadius: 14 }}
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
@@ -137,7 +128,7 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
                         <button
                           disabled={exportingId === video.projectId}
                           onClick={(e) => { e.stopPropagation(); onExport(video) }}
-                          className="px-3 py-1 text-xs font-medium rounded-full transition-all"
+                          className="px-3 py-1 text-xs font-medium rounded-full"
                           style={{
                             background: '#D4826A',
                             color: '#FFF',
@@ -150,16 +141,6 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
                     </div>
                   )}
                 </div>
-
-                {/* Label below card */}
-                <div
-                  className="text-center mt-2 transition-opacity duration-300"
-                  style={{ opacity: isActive ? 1 : 0 }}
-                >
-                  <p className="text-sm font-medium" style={{ color: '#2D2A26' }}>
-                    {video.productName}
-                  </p>
-                </div>
               </div>
             )
           })}
@@ -168,8 +149,8 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
 
       {/* Navigation arrows */}
       <button
-        onClick={handlePrev}
-        className="absolute left-4 top-1/2 mt-4 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+        onClick={() => { handlePrev(); setPaused(true) }}
+        className="absolute left-6 top-1/2 mt-8 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
         style={{ background: 'rgba(212, 130, 106, 0.15)', color: '#D4826A' }}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -177,8 +158,8 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
         </svg>
       </button>
       <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 mt-4 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+        onClick={() => { handleNext(); setPaused(true) }}
+        className="absolute right-6 top-1/2 mt-8 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
         style={{ background: 'rgba(212, 130, 106, 0.15)', color: '#D4826A' }}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -186,12 +167,21 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
         </svg>
       </button>
 
-      {/* Active video actions */}
-      {videos[activeIndex] && (
+      {/* Active video label */}
+      {activeVideo && (
+        <div className="text-center mt-6">
+          <p className="text-base font-medium" style={{ color: '#2D2A26' }}>
+            {activeVideo.productName}
+          </p>
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {activeVideo && (
         <div className="flex items-center justify-center gap-3 mt-4">
-          {videos[activeIndex].videoUrl && (
+          {activeVideo.videoUrl && (
             <button
-              onClick={() => onPublish(videos[activeIndex])}
+              onClick={() => onPublish(activeVideo)}
               className="px-5 py-2 text-sm font-medium rounded-full transition-all hover:scale-105"
               style={{ background: '#D4826A', color: '#FFF' }}
             >
@@ -199,7 +189,7 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
             </button>
           )}
           <a
-            href={videos[activeIndex].bazaarUrl}
+            href={activeVideo.bazaarUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 text-sm rounded-full border transition-all hover:scale-105 inline-flex items-center gap-1.5"
@@ -210,9 +200,9 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
               <path d="M4.5 2.5h5v5M9.5 2.5L2.5 9.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
-          {videos[activeIndex].videoUrl && (
+          {activeVideo.videoUrl && (
             <button
-              onClick={() => navigator.clipboard.writeText(videos[activeIndex].videoUrl)}
+              onClick={() => navigator.clipboard.writeText(activeVideo.videoUrl)}
               className="px-4 py-2 text-sm rounded-full border transition-all hover:scale-105"
               style={{ borderColor: '#C4BFB6', color: '#8A8580' }}
             >
@@ -223,11 +213,11 @@ export default function VideoCarousel({ videos, onPublish, onExport, exportingId
       )}
 
       {/* Dots */}
-      <div className="flex items-center justify-center gap-2 mt-4">
+      <div className="flex items-center justify-center gap-1.5 mt-5">
         {videos.map((_, i) => (
           <button
             key={i}
-            onClick={() => setActiveIndex(i)}
+            onClick={() => { setActiveIndex(i); setPaused(true) }}
             className="rounded-full transition-all"
             style={{
               width: i === activeIndex ? 20 : 6,

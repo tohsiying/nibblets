@@ -25,6 +25,15 @@ const PLATFORMS = [
 
 const MOCK_PRODUCTS: Product[] = [
   {
+    id: 'demo-007', title: 'Longer Than Ever Mascara', handle: 'longer-than-ever-mascara',
+    status: 'active', vendor: 'Lash Co', product_type: 'Mascara',
+    price_min: 18.00, price_max: 18.00, variants: [
+      { id: 'v-demo-007', title: 'Default', price: 18.00, sku: 'MASC-LTE-001', inventory_quantity: 67 },
+    ],
+    collections: ['Best Sellers'], featured_image_url: '/mascara.png', inventory_total: 67,
+    created_at: '2026-03-15T08:00:00Z', updated_at: '2026-03-27T10:00:00Z',
+  },
+  {
     id: 'demo-001', title: 'Glow Serum', handle: 'glow-serum',
     status: 'active', vendor: 'Glow Beauty', product_type: 'Skincare',
     price_min: 48.00, price_max: 48.00, variants: [
@@ -149,65 +158,81 @@ export default function GeneratePage() {
 
   return (
     <Shell title="Generate">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-1">
-          {isGenerating && selectedProduct
-            ? selectedProduct.title
-            : 'Create UGC Ad'}
-        </h2>
-        <p className="text-sm text-text-tertiary">
-          {pipeline.state === 'running'
-            ? 'Generating your ad...'
-            : pipeline.state === 'complete'
-            ? 'Your ad is ready'
-            : pipeline.state === 'error'
-            ? 'Something went wrong'
-            : 'Select a product to generate a UGC-style video ad'}
-        </p>
-      </div>
-
-      {/* Pipeline Progress (replaces product grid when active) */}
+      {/* Pipeline Progress (replaces everything when active) */}
       {isGenerating ? (
-        <PipelineProgress
-          state={pipeline.state}
-          currentStep={pipeline.currentStep}
-          progress={pipeline.progress}
-          message={pipeline.message}
-          events={pipeline.events}
-          videoUrl={pipeline.videoUrl}
-          projectId={pipeline.projectId}
-          error={pipeline.error}
-          costSoFar={pipeline.costSoFar}
-          startedAt={pipeline.startedAt}
-          onReset={pipeline.reset}
-          onRetry={selectedProduct ? () => pipeline.start(selectedProduct) : undefined}
-        />
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {selectedProduct?.title || 'Generating'}
+            </h2>
+            <p className="text-sm text-text-tertiary mt-1">
+              {pipeline.state === 'running' ? 'Creating your ad...' : pipeline.state === 'complete' ? 'Your ad is ready' : 'Something went wrong'}
+            </p>
+          </div>
+          <PipelineProgress
+            state={pipeline.state}
+            currentStep={pipeline.currentStep}
+            progress={pipeline.progress}
+            message={pipeline.message}
+            events={pipeline.events}
+            videoUrl={pipeline.videoUrl}
+            projectId={pipeline.projectId}
+            error={pipeline.error}
+            costSoFar={pipeline.costSoFar}
+            startedAt={pipeline.startedAt}
+            onReset={pipeline.reset}
+            onRetry={selectedProduct ? () => pipeline.start(selectedProduct) : undefined}
+          />
+        </div>
       ) : (
         <>
-          {isMock && (
-            <div className="bg-status-warning/10 border border-status-warning/20 rounded-lg px-4 py-2 mb-4 flex items-center justify-between">
-              <span className="text-xs text-status-warning">
-                Using demo data — connect your store for live products
-              </span>
+          {/* Hero Section */}
+          <div className="relative -mx-5 -mt-5 px-8 pt-10 pb-8 mb-8 overflow-hidden rounded-b-3xl" style={{ background: 'linear-gradient(135deg, #F9E4E0 0%, #F5D5CF 40%, #EBC4BE 100%)' }}>
+            <div className="relative z-10 max-w-lg">
+              <p className="text-xs font-medium uppercase tracking-widest mb-3" style={{ color: '#C4826A' }}>
+                AI Content Studio
+              </p>
+              <h2 className="text-3xl leading-tight mb-3" style={{ fontFamily: "'Playfair Display', serif", color: '#2D2A26' }}>
+                Create Beautiful<br />UGC Ads Instantly
+              </h2>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: '#6B5E5E' }}>
+                Select a product and let AI generate authentic, scroll-stopping video ads tailored to your brand.
+              </p>
+              {isMock && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs" style={{ background: 'rgba(212,130,106,0.15)', color: '#C4826A' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  Demo mode — connect your Shopify store for live products
+                </span>
+              )}
             </div>
-          )}
+            {/* Decorative circles */}
+            <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #D4826A, transparent)' }} />
+            <div className="absolute -right-8 bottom-0 w-40 h-40 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #D4826A, transparent)' }} />
+          </div>
 
-          {/* Search */}
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full max-w-sm bg-surface-2 border border-border rounded-md px-3 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-active"
-            />
+          {/* Section: Select Product */}
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <h3 className="text-lg text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Select a Product
+              </h3>
+              <p className="text-xs text-text-tertiary mt-0.5">Choose a product to feature in your ad</p>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-white border border-border rounded-full px-4 py-1.5 text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent w-48"
+              />
+            </div>
           </div>
 
           {/* Product Grid */}
-          <div className={selectedProduct ? 'pb-20' : ''}>
+          <div className="pb-4">
             {filtered.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 {filtered.map((product) => (
                   <ProductCard
                     key={product.id}
@@ -218,6 +243,10 @@ export default function GeneratePage() {
                         selectedProduct?.id === product.id ? null : product
                       )
                     }
+                    onGenerate={() => {
+                      setSelectedProduct(product)
+                      pipeline.start(product)
+                    }}
                   />
                 ))}
               </div>
@@ -231,7 +260,7 @@ export default function GeneratePage() {
 
           {/* Generated Videos Carousel */}
           {historyData?.videos?.length > 0 && (
-            <div className="mt-6 -mx-5 px-5 py-6 rounded-xl" style={{ background: '#F5F0E8' }}>
+            <div className="mt-4 -mx-5 px-5 py-8 rounded-2xl" style={{ background: 'linear-gradient(180deg, #FFF5F5 0%, #F9E4E0 100%)' }}>
               <VideoCarousel
                 videos={historyData.videos}
                 exportingId={exportingId}
@@ -257,35 +286,6 @@ export default function GeneratePage() {
             </div>
           )}
 
-          {/* Selected product bottom bar */}
-          {selectedProduct && (
-            <div className="fixed bottom-0 left-60 right-0 bg-surface-1 border-t border-border px-5 py-4 z-40">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-surface-2 rounded border border-border flex items-center justify-center text-text-tertiary text-sm">
-                    {selectedProduct.featured_image_url ? (
-                      <img
-                        src={selectedProduct.featured_image_url}
-                        alt={selectedProduct.title}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    ) : (
-                      selectedProduct.title.charAt(0)
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">{selectedProduct.title}</p>
-                    <p className="text-xs text-text-tertiary">
-                      {formatCurrency(selectedProduct.price_min)} · {selectedProduct.vendor}
-                    </p>
-                  </div>
-                </div>
-                <Button variant="primary" onClick={() => pipeline.start(selectedProduct)}>
-                  Generate Ad
-                </Button>
-              </div>
-            </div>
-          )}
         </>
       )}
       {/* Publish Modal */}

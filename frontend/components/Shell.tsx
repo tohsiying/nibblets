@@ -62,12 +62,16 @@ export default function Shell({ title, children }: ShellProps) {
   return (
     <div className="flex h-screen bg-surface-0">
       {/* Sidebar */}
-      <aside className="w-60 bg-surface-1 border-r border-border flex flex-col flex-shrink-0">
+      <aside className="w-60 bg-white border-r border-border flex flex-col flex-shrink-0">
         {/* Logo */}
-        <div className="px-4 py-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-accent" />
-            <span className="text-sm font-semibold text-text-primary">Shopify App</span>
+        <div className="px-4 py-5 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #D4826A, #E8A090)' }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4l2-4z" fill="white" />
+              </svg>
+            </div>
+            <span className="text-sm font-semibold text-text-primary tracking-tight">Nibblets</span>
           </div>
         </div>
 
@@ -80,10 +84,10 @@ export default function Shell({ title, children }: ShellProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors duration-150 ease-out',
+                  'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors duration-150 ease-out',
                   active
-                    ? 'bg-surface-2 text-text-primary border-l-2 border-accent'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-2/50'
+                    ? 'bg-surface-3 text-text-primary font-medium'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
                 )}
               >
                 <span className={active ? 'text-accent' : 'text-text-tertiary'}>
@@ -109,8 +113,8 @@ export default function Shell({ title, children }: ShellProps) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="h-12 bg-surface-1 border-b border-border flex items-center justify-between px-5 flex-shrink-0">
-          <h1 className="text-sm font-medium text-text-primary">{title}</h1>
+        <header className="h-12 bg-white border-b border-border flex items-center justify-between px-5 flex-shrink-0">
+          <h1 className="text-base font-medium text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>{title}</h1>
           {STORE_URL && (
             <a
               href={`${STORE_URL}/admin`}

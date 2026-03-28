@@ -6,9 +6,10 @@ interface ProductCardProps {
   product: Product
   selected: boolean
   onClick: () => void
+  onGenerate?: () => void
 }
 
-export default function ProductCard({ product, selected, onClick }: ProductCardProps) {
+export default function ProductCard({ product, selected, onClick, onGenerate }: ProductCardProps) {
   const price =
     product.price_min === product.price_max
       ? formatCurrency(product.price_min)
@@ -20,10 +21,10 @@ export default function ProductCard({ product, selected, onClick }: ProductCardP
     <div
       onClick={onClick}
       className={cn(
-        'bg-surface-1 border rounded-lg overflow-hidden cursor-pointer transition-all duration-150 ease-out',
+        'group bg-white border rounded-xl overflow-hidden cursor-pointer transition-all duration-150 ease-out shadow-sm',
         selected
-          ? 'border-accent ring-1 ring-accent/30'
-          : 'border-border hover:border-border-hover'
+          ? 'border-accent ring-2 ring-accent/20'
+          : 'border-border hover:border-border-hover hover:shadow-md'
       )}
     >
       {/* Image / Placeholder */}
@@ -40,12 +41,19 @@ export default function ProductCard({ product, selected, onClick }: ProductCardP
           </span>
         )}
 
-        {/* Selected checkmark */}
-        {selected && (
-          <div className="absolute top-2 right-2 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2.5 6l2.5 2.5 4.5-5" stroke="#0A0A0B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+        {/* Hover overlay with Generate Ad button */}
+        {onGenerate && (
+          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onGenerate()
+              }}
+              className="px-5 py-2 text-sm font-medium text-white rounded-full shadow-lg transition-all hover:scale-105"
+              style={{ background: 'linear-gradient(135deg, #D4826A, #C06B55)' }}
+            >
+              Generate Ad
+            </button>
           </div>
         )}
       </div>

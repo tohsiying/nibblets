@@ -74,7 +74,7 @@ export default function PipelineProgress({
         <div className="flex flex-col items-center py-8 gap-4">
           <div className="w-10 h-10 rounded-full bg-status-error/10 flex items-center justify-center">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M6 6l8 8M14 6l-8 8" stroke="#FF4444" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M6 6l8 8M14 6l-8 8" stroke="#D45454" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </div>
           <div className="text-center">
@@ -108,7 +108,7 @@ export default function PipelineProgress({
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M2.5 6l2.5 2.5 4.5-5" stroke="#0A0A0B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2.5 6l2.5 2.5 4.5-5" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
             <span className="text-sm font-medium text-accent">Video generated</span>
@@ -208,7 +208,7 @@ export default function PipelineProgress({
                 {status === 'completed' ? (
                   <div className="w-4 h-4 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
                     <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 5l2 2 4-4" stroke="#00FF94" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2 5l2 2 4-4" stroke="#D4826A" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 ) : status === 'active' ? (

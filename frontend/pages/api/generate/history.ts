@@ -37,8 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // If baz project list fails, just use saved videos
     }
 
-    // Merge: saved videos first (they have mp4s), then baz projects
-    const allVideos = [...savedVideos, ...bazProjects]
+    // Only return videos that have an exported mp4 URL
+    const allVideos = [...savedVideos, ...bazProjects].filter((v) => v.videoUrl)
 
     res.status(200).json({ videos: allVideos })
   } catch (err: any) {

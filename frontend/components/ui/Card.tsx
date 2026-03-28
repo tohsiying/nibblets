@@ -13,7 +13,7 @@ export default function Card({ children, title, subtitle, className, action }: C
   return (
     <div
       className={cn(
-        'bg-surface-1 border border-border rounded-lg p-4',
+        'bg-white border border-border rounded-xl p-4 shadow-sm',
         className
       )}
     >

@@ -5,31 +5,31 @@ module.exports = {
     extend: {
       colors: {
         surface: {
-          0: '#0A0A0B',
-          1: '#151518',
-          2: '#1A1A1A',
-          3: '#222225',
+          0: '#FFF5F5',    // lightest blush background
+          1: '#FFFFFF',    // white cards
+          2: '#FFF0F0',    // subtle pink tint for inputs/hovers
+          3: '#FFE4E6',    // deeper blush for nested elements
         },
         border: {
-          DEFAULT: 'rgba(255,255,255,0.08)',
-          hover: 'rgba(255,255,255,0.12)',
-          active: 'rgba(255,255,255,0.16)',
+          DEFAULT: 'rgba(190,130,140,0.18)',
+          hover: 'rgba(190,130,140,0.30)',
+          active: 'rgba(190,130,140,0.45)',
         },
         text: {
-          primary: 'rgba(255,255,255,0.95)',
-          secondary: 'rgba(255,255,255,0.72)',
-          tertiary: 'rgba(255,255,255,0.48)',
+          primary: '#2D2A26',
+          secondary: '#6B5E5E',
+          tertiary: '#9B8E8E',
         },
         accent: {
-          DEFAULT: '#00FF94',
-          dim: 'rgba(0,255,148,0.12)',
-          hover: 'rgba(0,255,148,0.18)',
+          DEFAULT: '#D4826A',
+          dim: 'rgba(212,130,106,0.10)',
+          hover: 'rgba(212,130,106,0.18)',
         },
         status: {
-          success: '#00FF94',
-          warning: '#FFB224',
-          error: '#FF4444',
-          info: '#3B82F6',
+          success: '#4CAF7D',
+          warning: '#E5A63E',
+          error: '#D45454',
+          info: '#5B8BD4',
         }
       },
       fontSize: {
